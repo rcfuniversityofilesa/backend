@@ -30,7 +30,6 @@ const programModel = new mongoose.Schema({
     },
     programImage: {
         type: String,
-        required: [true, 'Program image is required'],
         trim: true
     },
     programDate: {

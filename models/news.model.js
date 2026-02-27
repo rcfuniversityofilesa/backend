@@ -25,7 +25,6 @@ const newsModel = new mongoose.Schema({
     },
     newsImage: {
         type: String,
-        required: [true, 'News image is required'],
         trim: true
     },
     newsDate: {
