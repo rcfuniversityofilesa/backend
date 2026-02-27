@@ -3,12 +3,12 @@ const { parsePhoneNumber } = require('libphonenumber-js')
 
 const phoneField = {
   type: String,
-  required: [true, 'Phone number is required'],
   unique: true,
+  sparse: true,
   trim: true,
 
   set: function(raw) {
-    if (!raw) return raw
+    if (!raw) return undefined; 
     try {
       const phone = parsePhoneNumber(raw, 'NG')
       if (phone.isValid()) return phone.number
@@ -44,6 +44,8 @@ const adminSchema = new mongoose.Schema({
     trim: true
   },
 
+  role: { type: String, trim: true, enum: ['Media', 'WorkersInTraining'], default: 'media' },
+
   password: { type: String, required: true, trim: true },
 
   serialNumber: {
@@ -57,7 +59,7 @@ const adminSchema = new mongoose.Schema({
   phoneNumber: phoneField,
   passport: { type: String, trim: true },
   inductionYear: { type: String, trim: true },
-  position: { type: String, trim: true },
+
 
   resetPasswordToken: String,
   resetPasswordExpire: Date

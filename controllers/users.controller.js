@@ -41,41 +41,55 @@ exports.getAppliedWorker = async (req, res) => {
   }
 }
 
+exports.getAppliedWorkerId = async (req, res) => {
+  try {
+    const appliedWorker = await newWorker.findById(req.params.id)
+
+    if (!appliedWorker) {
+      return res.status(404).json({ success: false, message: 'Not found' })
+    }
+
+    res.status(200).json({ success: true, data: appliedWorker })
+  } catch (err) {
+    return res.status(500).send('Internal server error')
+  }
+}
+
 
 
 
 exports.sendUserMessages = async (req, res) => {
-    try {
-        const usersMgs = await usersMessageModel.create({ ...req.body });
+  try {
+    const usersMgs = await usersMessageModel.create({ ...req.body });
 
-        if (!usersMgs) {
-            return res.status(404).json({ success: false, message: "Message can't be made" })
-        }
-
-        res.status(200).json({ success: true, message: 'Message sent successfully' })
-    } catch (err) {
-        return res.status(500).send('Internal server error')
+    if (!usersMgs) {
+      return res.status(404).json({ success: false, message: "Message can't be made" })
     }
+
+    res.status(200).json({ success: true, message: 'Message sent successfully' })
+  } catch (err) {
+    return res.status(500).send('Internal server error')
+  }
 }
 
 exports.getUserMessages = async (req, res) => {
-    try {
-        const usersMgs = await usersMessageModel
-            .find({ replied: false })
-            .sort({ submittedAt: -1 })
+  try {
+    const usersMgs = await usersMessageModel
+      .find({ replied: false })
+      .sort({ submittedAt: -1 })
 
-        if (!usersMgs.length) {
-            return res.status(200).json({
-                success: true,
-                data: []
-            })
-        }
-
-        return res.status(200).json({
-            success: true,
-            data: usersMgs
-        })
-    } catch (err) {
-        return res.status(500).send('Internal server error')
+    if (!usersMgs.length) {
+      return res.status(200).json({
+        success: true,
+        data: []
+      })
     }
+
+    return res.status(200).json({
+      success: true,
+      data: usersMgs
+    })
+  } catch (err) {
+    return res.status(500).send('Internal server error')
+  }
 }

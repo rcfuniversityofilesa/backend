@@ -15,7 +15,8 @@ const saltRounds = 10
 
 exports.adminregister = async (req, res) => {
     try {
-        const { firstName, middleName, lastName, email, password } = req.body
+        const { firstName, middleName, lastName, email, role, password } = req.body
+
 
         const existing = await admin.findOne({ email })
         if (existing) {
@@ -31,6 +32,7 @@ exports.adminregister = async (req, res) => {
             middleName,
             lastName,
             email,
+            role,
             password: hashed,
             serialNumber: serialNumber
         })
@@ -219,6 +221,7 @@ exports.adminregister = async (req, res) => {
                                     <h3 style="color: #667eea; margin-top: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Account Information</h3>
                                     <p><strong>Name:</strong> ${req.body.firstName} ${req.body.middleName} ${req.body.lastName}</p>
                                     <p><strong>Email:</strong> ${req.body.email}</p>
+                                    <p><strong>Post:</strong> ${req.body.role}</p>
                                     <p><strong>Serial Number:</strong> ${serialNumber}</p>
                                     <p><strong>Status:</strong> <span style="color: #4caf50; font-weight: 600;">Active</span></p>
                                 </div>
@@ -286,7 +289,7 @@ exports.adminregister = async (req, res) => {
         })
 
     } catch (err) {
-        // console.log('Error registering user:', err)
+        console.log('Error registering user:', err)
         return res.status(500).send('Internal server error')
     }
 }
@@ -306,7 +309,7 @@ exports.adminLogin = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: adminUser._id },
+            { id: adminUser._id, role: adminUser.role },
             JWTKey,
             { expiresIn: "1h" }
         );
@@ -317,6 +320,7 @@ exports.adminLogin = async (req, res) => {
             middleName: adminUser.middleName,
             lastName: adminUser.lastName,
             email: adminUser.email,
+            role: adminUser.role,
             serialNumber: adminUser.serialNumber,
             passport: adminUser.passport
         };
@@ -329,7 +333,7 @@ exports.adminLogin = async (req, res) => {
         });
 
     } catch (err) {
-        // console.error("Login error:", err);
+        console.error("Login error:", err);
         return res.status(500).json({ success: false, message: "Server error" });
     }
 };
@@ -337,7 +341,7 @@ exports.adminLogin = async (req, res) => {
 exports.getProfile = async (req, res) => {
     try {
         const profile = await admin.findById(req.adminId).select(
-            "firstName middleName lastName email serialNumber gender, phoneNumber position passport inductionYear"
+            "firstName middleName lastName email serialNumber gender role phoneNumber position passport inductionYear"
         )
 
         if (!profile) {
@@ -357,7 +361,7 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfilePost = async (req, res) => {
     try {
-        const adminId = req.params.id;
+        const adminId = req.adminId;;
 
         let uploadedImage = null;
 
@@ -371,13 +375,12 @@ exports.updateProfilePost = async (req, res) => {
         const updated = await admin.findByIdAndUpdate(
             adminId,
             {
-                fullName: req.body.fullName,
+                firstName: req.body.firstName,
                 middleName: req.body.middleName,
                 lastName: req.body.lastName,
                 gender: req.body.gender,
                 phoneNumber: req.body.phoneNumber,
                 inductionYear: req.body.inductionYear,
-                position: req.body.position,
                 passport: uploadedImage
             },
             { new: true }

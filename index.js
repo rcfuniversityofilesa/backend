@@ -1,6 +1,8 @@
-const express = require('express')
+const express = require("express")
 const app = express()
+
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 const dotenv = require('dotenv')
 dotenv.config()
@@ -10,16 +12,19 @@ const mongoose = require('mongoose')
 const PORT = process.env.PORT
 const mongodb = process.env.mongo_URI
 
-const frontendURL = process.env.frontend_URL
 
 require("node:dns").setServers(["8.8.8.8", "1.1.1.1"]);
 
-const cors = require('cors')
+const cors = require('cors');
+
+const frontendURL = process.env.frontend_URL;
+
 app.use(cors({
     origin: frontendURL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
-}))
+}));
+
 
 mongoose.connect(mongodb)
     .then(() =>{
